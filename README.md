@@ -1,246 +1,289 @@
-# UCLA Library Website
+# 🌉 Nuxt Bridge
 
-A [Nuxt](https://nuxtjs.org/) powered frontend website for the UCLA Library.
+> Experience Nuxt 3 features on existing Nuxt 2 projects.
 
-## Build Setup
+Bridge is a forward-compatibility layer that allows you to experience many of the new Nuxt 3 features by simply installing and enabling a Nuxt module.
 
-<details><summary>SET UP THE NUXT SITE</summary>
+Using Nuxt Bridge, you can make sure your project is (almost) ready for Nuxt 3 and have the best developer experience without needing a major rewrite or risk breaking changes.
 
-**This is a Nuxt site, it builds and deploys like any other Nuxt project.**
+⚠️ **Note:** Nuxt Bridge provides identical features to Nuxt 3 ([Nuxt 3 docs](https://nuxt.com/docs/getting-started/views#views)) but there are some limitations, notably that `useAsyncData` and `useFetch` composables are not available. Please read the rest of this page for details. 
 
-Works best with the [fuxt-backend](https://github.com/funkhaus/fuxt-backend) WordPress theme as the backend.
+⚠️ **Note:** Nuxt Bridge does not support Internet Explorer. Supported browsers are listed at https://caniuse.com/es6-module-dynamic-import.
 
-**First step:** Duplicate and rename `.example.env` to `.env`. Define any vars environment needed there.
+🌱 **Note:** If you're starting a fresh Nuxt project, please skip this module and directly go to the [Nuxt 3 Installation](https://nuxt.com/docs/getting-started/introduction).
+
+## 💻 Development
+
+- Clone repository
+- Ensure you have the latest LTS version of Node.js installed
+- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable` to enable `pnpm` and `yarn`
+- Install dependencies with `pnpm install`
+- Run `pnpm dev:prepare` to activate passive development
+- Open playground with `pnpm dev`
+
+Learn more about in our documentation on [how to contribute to Nuxt](https://nuxt.com/docs/community/contribution).
+
+
+## Installation
+
+### Upgrade to the latest Nuxt 2
+
+Make sure your dev server (`nuxt dev`) isn't running, remove any package lock files (`package-lock.json`, `yarn.lock` or `pnpm-lock.yaml`), and install the latest `nuxt` version:
+
+```diff [package.json]
+- "nuxt": "^2.15.0"
++ "nuxt": "^2.16.0"
+```
+
+Then, reinstall your dependencies:
 
 ```bash
-# install dependencies
-$ npm install
+# Using yarn
+yarn install
 
-# serve with hot reload at localhost:3000
-$ npm run dev
+# Using npm
+npm install
 
-# serve with hot reload Storybook at localhost:3003
-$ npm run storybook
+# Using pnpm
+pnpm install
+```
 
-# build for production and launch server
-$ npm run build
-$ npm start
+Once the installation is complete, make sure both development and production builds are working as expected before proceeding.
 
-# build Storybook for production
-$ npx nuxt storybook build
+### Install Nuxt Bridge
 
-# generate static nuxt site
-$ npm run generate
+Install `@nuxt/bridge-edge` as a development dependency:
+
+```bash
+
+# Using yarn
+yarn add --dev @nuxt/bridge@npm:@nuxt/bridge-edge
+
+# Using npm
+npm install -D @nuxt/bridge@npm:@nuxt/bridge-edge
+
+# Using pnpm
+pnpm install -D @nuxt/bridge@npm:@nuxt/bridge-edge
 
 ```
 
-</details>
+## Update your scripts
 
----
+You will also need to update your scripts within your `package.json` to reflect the fact that Nuxt will now produce a Nitro server as build output.
 
-## Designs - Figma
+### Nuxi
 
--   [DESIGNS](https://www.figma.com/file/ZT2qWKTlOxfhr1QUS2rFPL/UI-Pattern-Library-(Client-Facing)-Final?node-id=0%)
+Nuxt 3 introduced the new Nuxt CLI command [`nuxi`](https://nuxt.com/docs/api/commands/add). Update your scripts as follows to leverage the better support from Nuxt Bridge:
 
--   [DESIGN TOKENS](https://www.figma.com/file/EKazRIMP4B15bD16UDbOwR/UCLA-Library-Design-System?node-id=117%3A5562)
+```diff
+{
+  "scripts": {
+-   "dev": "nuxt",
++   "dev": "nuxi dev",
+-   "build": "nuxt build",
++   "build": "nuxi build",
+-   "start": "nuxt start",
++   "start": "nuxi preview"
+  }
+}
+```
 
-<details><summary>UX GUIDE</summary>
+### Static target
 
----
+If you have set `target: 'static'` in your `nuxt.config` then you need to ensure that you update your build script to be `nuxi generate`.
 
-### STEPS
+```json [package.json]
+{
+  "scripts": {
+    "build": "nuxi generate"
+  }
+}
+```
 
-*(font-size/line-height/letter-spacing)*
+### Server target
 
-#### `@include step-5;`  
-+ **page-title**  
-    + *Karbon Regular*  
-    + Desktop - 84px / 100em / 0em  
-    + Tablet -    50px/100em/0em  
-    + Mobile -    36px/100em/0em  
+For all other situations, you can use the `nuxi build` command.
 
-#### `@include step-4;`  
-+ **section-heading**  
-    + *Karbon Regular*  
-    + Desktop - 63px/125em/0em  
-    + Tablet -    42px/125em/0em  
-    + Mobile -    32px/125em/0em  
+```json [package.json]
+{
+  "scripts": {
+    "build": "nuxi build",
+    "start": "nuxi preview"
+  }
+}
+```
 
-#### `@include step-3;`
-+ **subheading**  
-    + *Karbon Regular*  
-    + Desktop - 48px/125em/0em  
-    + Tablet - 34px/125em/0em  
-    + Mobile - 28px/125em/0em  
+## Update `nuxt.config`
 
-#### `@include step-2;`  
-+ **subheading-small**  
-    + *Karbon Medium*  
-    + Desktop - 36px/120em/0.25em  
-    + Tablet - 28px/125em/0em  
-    + Mobile - 28px/125em/0em  
+Please make sure to avoid any CommonJS syntax such as `module.exports`, `require` or `require.resolve` in your config file. It will soon be deprecated and unsupported.
 
-#### `@include step-1;`  
-+ **subtitle**  
-    + *Karbon Medium*  
-    + Desktop - 26px/125em/0em  
-    + Tablet - 24px/125em/0em  
-    + Mobile - 22px/125em/0em
+You can use static `import`, dynamic `import()` and `export default` instead. Using TypeScript by renaming to `nuxt.config.ts` is also possible and recommended.
 
----
+```ts [nuxt.config.js|ts]
+import { defineNuxtConfig } from '@nuxt/bridge'
 
-### HEADINGS
+export default defineNuxtConfig({
+  // Your existing configuration
+})
+```
 
-All Heading tags are `var(--font-primary)` (Karbon)
+## Update `tsconfig.json`
 
-#### `<h1 class="page-title"></h1>`
-+ `font-size: var(--step-5);` (84px/50px/36px)
-+ `font-weight: 400;`
+If you are using TypeScript, you can edit your `tsconfig.json` to benefit from auto-generated Nuxt types:
 
-#### `<h2 class="section-heading"></h2>`
-+ `font-size: var(--step-4);` (63px/42px/32px)
-+ `font-weight: 400;`
+```diff [tsconfig.json]
+{
++ "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    ...
+  }
+}
+```
 
-#### `<h3 class="subheading"></h3>`
-+ `font-size: var(--step-3);` (48px/34px/28px)
-+ `font-weight: 400;`
+Keep in mind that all options extended from `./.nuxt/tsconfig.json` will be overwritten by the options defined in your `tsconfig.json`.
 
-#### `<h4 class="subheading-small"></h4>`
-+ `font-size: var(--step-3);` (48px/34px/28px)
-+ `font-weight: 500;`
+Overwriting options such as `"compilerOptions.paths"` with your own configuration will lead TypeScript to not factor in the module resolutions from `./.nuxt/tsconfig.json`. This can lead to module resolutions such as `#imports` not being recognized.
 
-#### `<h5 class="subtitle"></h5>`
-+ `font-size: var(--step-3);` (48px/34px/28px)
-+ `font-weight: 500;`
+In case you need to extend options provided by `./.nuxt/tsconfig.json` further, you can use the `alias` property withing your `nuxt.config`. `nuxi` will pick them up and extend `./.nuxt/tsconfig.json` accordingly.
 
-#### `<h6 class="heading-six"></h6>`
-+ `font-size: 20px;`
-+ `font-weight: 500;`
+## Migrate Composition API
 
----
+If you were using `@vue/composition-api` or `@nuxtjs/composition-api`, please read the [composition api migration guide](https://nuxt.com/docs/bridge/bridge-composition-api).
 
-### FONTS
-    `var(--font-primary)` Karbon  
-    `var(--font-secondary)`Proxima Nova
+### Migrate from CommonJS to ESM
 
----
+Nuxt 3 natively supports TypeScript and ECMAScript Modules. Please check [Native ES Modules](https://nuxt.com/docs/guide/concepts/esm) for more info and upgrading.
 
-</details>
+## Remove incompatible and obsolete modules
 
----
+- Remove `@nuxt/content` (1.x). A rewrite for Nuxt 3 is planned (2.x)
+- Remove `nuxt-vite`: Bridge enables same functionality
+- Remove `@nuxt/typescript-build`: Bridge enables same functionality
+- Remove `@nuxt/typescript-runtime` and `nuxt-ts`: Nuxt 2 has built-in runtime support
+- Remove `@nuxt/nitro`: Bridge injects same functionality
+- Remove `@vue/composition-api` from your dependencies ([migration guide](https://nuxt.com/docs/bridge/bridge-composition-api)).
+- Remove `@nuxtjs/composition-api` from your dependencies (and from your modules in `nuxt.config`) ([migration guide](https://nuxt.com/docs/bridge/bridge-composition-api)).
 
-## Helpful Documentation & Tools
+## Exclude built Nitro folder from git
 
-<details><summary>DOCS & TOOLS</summary>
+Add the folder `.output` to the `.gitignore` file.
 
-+ [ORG Chart](https://jira.library.ucla.edu/secure/attachment/72225/lib_org_chart.txt)
-+ [Current UCLA Library Site](https://www.library.ucla.edu/)
-+ [Team - Youtube](https://www.youtube.com/playlist?list=PLD6zTMdoCybJKdTBgm0UesCY_sTMOSOAn)
-+ [Clippy](https://bennettfeely.com/clippy/)
-+ [Flexy Boxes](https://the-echoplex.net/flexyboxes/)
-+ [Nth Child Calculator](https://www.nealgrosskopf.com/tech/resources/80/)
-+ [Lorem Ipsum](https://loremipsum.io/)
+## Ensure everything goes well
 
-+ [Nuxt Docs](https://nuxtjs.org/docs/concepts/nuxt-lifecycle/)
-    + [Funkhaus Components](https://github.com/funkhaus/fh-components)
-+ [Craft Docs](https://craftcms.com/docs/3.x/project-config.html)
-    + [Craft Plugin Store](https://plugins.craftcms.com/)
-        + [Redactor](https://imperavi.com/redactor/docs/)
-        + [Feed Me](https://docs.craftcms.com/feed-me/v4/)
-        + [Navigation](https://verbb.io/craft-plugins/navigation/docs/get-started/installation-setup)
-        + [Neo](https://github.com/spicywebau/craft-neo/wiki)
-+ SCRIPTS
-    + `npm run dev` : "nuxt",
-    + `npm run build` : "nuxt build",
-    + `npm run generate` : "nuxt generate",
-    + `npm run start` : "nuxt start",
-    + `npm run storybook` : "nuxt storybook --port 3009",
-    + `npm run storybook-build` : "nuxt storybook build",
-    + `npm run cypress` : "cypress open",
-    + `npm run cypress-run` : "cypress run",
-    + `npm run lint` : "eslint ./",
-    + `npm run lint-fix` : "eslint --fix ./",
-    + `npm run percy` : "percy storybook http://localhost:3003",
-    + `npm run percy-static` : "percy storybook ./storybook-static"
+✔️ Try with `nuxi dev` and `nuxi build` (or `nuxi generate`) to see if everything goes well.
 
-</details>
+🐛 Is something wrong? Please let us know by creating an issue. Also, you can easily disable the bridge in the meantime:
 
----
+```ts [nuxt.config.js|ts]
+import { defineNuxtConfig } from '@nuxt/bridge'
 
-## Routes
+export default defineNuxtConfig({
+  bridge: false // Temporarily disable bridge integration
+})
+```
 
-<details><summary>GET HELP</summary>
+## New plugins format (optional)
 
-| Menu name                     | URL                                               | Figma template name       |
-| ----------------------------- | ------------------------------------------------- | ------------------------- |
-| Borrowing Books and Equipment | /services-resources/borrowing-books-and-equipment | Help Topic - Landing Page |
-| Research                      | /services-resources/research                      | Help Topic - Landing Page |
-| Teaching                      | ?                                                 | ?                         |
-| Remote Access                 | ?                                                 | ?                         |
-| Find & Reserve a Space        | ?                                                 | ?                         |
-| View all services & Resources | ?                                                 | ?                         |
+You can now migrate to the Nuxt 3 plugins API, which is slightly different in format from Nuxt 2.
 
-</details>
+Plugins now take only one argument (`nuxtApp`). You can find out more in [the docs](https://nuxt.com/docs/guide/directory-structure/plugins).
 
-<details><summary>VISIT</summary>
+```js
+export default defineNuxtPlugin(nuxtApp => {
+  nuxtApp.provide('injected', () => 'my injected function')
+  // now available on `nuxtApp.$injected`
+})
+```
 
-| Menu name                  | URL               | Figma template name                                                                 |
-| -------------------------- | ----------------- | ----------------------------------------------------------------------------------- |
-| Location & Hours           | ?                 | ?                                                                                   |
-| Exhibits & Upcoming Events | /events-exhibits/ | All Exhibits & Upcoming Events - Listing Page (General Template, list view default) |
-| Our Collections            | ?                 | ?                                                                                   |
-| For the General Public     | ?                 | ?                                                                                   |
+If you want to use the new Nuxt composables (such as `useNuxtApp` or `useRuntimeConfig`) within your plugins, you will need to use the `defineNuxtPlugin` helper for those plugins.
 
-</details>
+Although a compatibility interface is provided via `nuxtApp.vueApp` you should avoid registering plugins, directives, mixins or components this way without adding your own logic to ensure they are not installed more than once, or this may cause a memory leak.
 
-<details><summary>ABOUT</summary>
+## New `useHead` (optional)
 
-| Menu name                    | URL | Figma template name |
-| ---------------------------- | --- | ------------------- |
-| About the UCLA Libraries     | ?   | ?                   |
-| Library News                 | ?   | ?                   |
-| Staff Directory              | ?   | ?                   |
-| Student Opportunities        | ?   | ?                   |
-| Awards, Fellowships & Grants | ?   | ?                   |
+Nuxt Bridge provides a new Nuxt 3 meta API that can be accessed with a new `useHead` composable.
 
-</details>
+```vue
+<script setup>
+useHead({
+  title: 'My Nuxt App',
+})
+</script>
+```
 
-<details><summary>OTHERS</summary>
+You will also need to enable this feature explicitly in your `nuxt.config`:
 
-| Menu name        | URL | Figma template name |
-| ---------------- | --- | ------------------- |
-| Location & Hours | ?   | ?                   |
+```js
+import { defineNuxtConfig } from '@nuxt/bridge'
 
-</details>
+export default defineNuxtConfig({
+  bridge: {
+    meta: true
+  }
+})
+```
 
----
+This `useHead` composable uses `@vueuse/head` under the hood (rather than `vue-meta`) to manipulate your `<head>`.
+Accordingly, we recommend not to use both the native Nuxt 2 `head()` properties as well as `useHead`, as they may conflict.
 
-## Redirects file
+For more information on how to use this composable, see [the docs](https://nuxt.com/docs/getting-started/seo-meta#seo-and-meta).
 
-The list of redirects is maintained in a google spreadsheet; it's contents must exported to the [Netlify _redirects file](https://docs.netlify.com/routing/redirects/)
+## Feature Flags
 
-Exporting redirects file to netlify:
-1. Go to google spreadsheet, File > Download > CSV
-2. Save in MEAP repo as `static/_redirects`
-3. delete header row (or comment out with #)
-4. delete any redirects from a URL to itself (currently only the first two, `/` and `/about`, but you can find them with the regex `^(.+)\s+\1\n`). It looks like you can probably skip this step and Netlify will figure things out, but it won't hurt
-5. remove `https://www.library.ucla.edu` from all URLs
-6. find/replace all `,` separators with spaces (I used 4 - `    `)
-7. delete all 
+You can optionally disable some features from bridge or opt-in to less stable ones. In normal circumstances, it is always best to stick with defaults!
 
-## LibCal Auth Procedure
+You can check [packages/bridge/src/module.ts](https://github.com/nuxt/bridge/blob/main/packages/bridge/src/module.ts) for latest defaults.
 
-<details><summary>LIBCAL</summary>
+```ts [nuxt.config.js|ts]
+import { defineNuxtConfig } from '@nuxt/bridge'
 
-1. At start of build, we need to exchange secret for token
-2. Token needs to be given to client side, so that search works
+export default defineNuxtConfig({
+  bridge: {
 
-</details>
+    // -- Opt-in features --
 
-## If your repo is Commitizen friendly:
+    // Use Vite as the bundler instead of webpack 4
+    // vite: true,
 
-Simply use git cz or just cz instead of git commit when committing. 
+    // Enable Nuxt 3 compatible useHead
+    // meta: true,
 
-When you're working in a Commitizen-friendly repository, you'll be prompted to fill in any required fields, and your commit messages will be formatted according to the standards defined by project maintainers.
 
-[![Add and commit with Commitizen](https://github.com/commitizen/cz-cli/raw/master/meta/screenshots/add-commit.png)](https://github.com/commitizen/cz-cli/raw/master/meta/screenshots/add-commit.png)
+    // -- Default features --
+
+    // Use legacy server instead of Nitro
+    // nitro: false,
+
+    // Use legacy generator rather than new nitro prerenderer
+    // nitroGenerator: false,
+
+    // Disable nuxt 3 compatible `nuxtApp` interface
+    // app: false,
+
+    // Disable Composition API support
+    // capi: false,
+
+    // ... or just disable legacy Composition API support
+    // capi: {
+    //   legacy: false
+    // },
+
+    // Do not transpile modules
+    // transpile: false,
+
+    // Disable composables auto importing
+    // imports: false,
+
+    // Do not warn about module incompatibilities
+    // constraints: false
+  },
+
+  vite: {
+    // Config for Vite
+  }
+})
+```
+
+## License
+
+[MIT](https://github.com/nuxt/nuxt.js/blob/dev/LICENSE)
