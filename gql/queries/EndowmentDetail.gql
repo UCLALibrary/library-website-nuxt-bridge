@@ -1,0 +1,43 @@
+#import "~/gql/fragments/Image"
+#import "~/gql/fragments/collections/AllFpbWithNoBanner"
+
+query EndowmentDetail($slug: [String!]) {
+  entry(section: "endowment", slug: $slug) {
+    uri
+    slug
+    sectionHandle
+    title
+    text: summary
+    heroImage {
+      ... on heroImage_heroImage_BlockType {
+        image {
+          ...Image
+        }
+        altText
+      }
+    }
+    alternativeName {
+      ... on alternativeName_alternativeName_BlockType {
+        languageAltName
+        fullName
+      }
+    }
+    endowmentDescription
+    subjectAreas {
+      title
+    }
+    donors {
+      ... on donors_donor_BlockType {
+        firstName
+        lastName
+      }
+    }
+    to: donationUrl
+    spakCode
+    associatedLocations {
+      title
+      uri
+    }
+    ...AllFpbWithNoBanner
+  }
+} 

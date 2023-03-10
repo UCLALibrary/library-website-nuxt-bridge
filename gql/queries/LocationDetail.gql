@@ -1,0 +1,215 @@
+#import "~/gql/fragments/collections/AllFpb"
+#import "~/gql/fragments/Image"
+
+query LocationDetail($slug: [String!]) {
+    entry(section: "location", slug: $slug) {
+        ... on location_location_Entry {
+            id
+            sectionHandle
+            slug
+            uri
+            affiliateLibraryUrl
+            locationType
+            title
+            text: summary
+            about: richTextSimplified
+            heroImage {
+                image {
+                    ...Image
+                }
+            }
+            email
+            phoneNumber
+            address {
+                id
+                addressLine1
+                addressLine2
+                addressCity
+                addressState
+                addressZipCode
+                addressCountry
+            }
+            howToGetHere
+            amenities(label: true)
+            amenitiesIcons: amenities(label: false)
+            space {
+                title
+                text: summary
+                reservationRequired
+                mediatorEmail
+                reservationUrl
+                spaceType {
+                    id
+                    title
+                }
+                spaceAmenities {
+                    id
+                    title
+                }
+                associatedLocations {
+                    id
+                    to: slug
+                    title
+                }
+            }
+            resourceServiceWorkshop {
+                id
+                text: summary
+                title
+                slug
+                uri
+                externalResourceUrl
+                type: serviceOrResourceType
+            }
+            campusMapId
+            libcalLocationIdForHours
+            staffMember {
+                id
+                email
+                to: uri
+            }
+            ...AllFpb
+        }
+    }
+    associatedArticles: entries(
+        section: "article"
+        relatedToEntries: { section: "location", slug: $slug }
+        orderBy: "dateUpdated desc"
+        limit: 3
+    ) {
+        ... on article_article_Entry {
+            id
+            title
+            associatedLocations {
+                id
+                title
+            }
+            to: slug
+            heroImage {
+                ... on heroImage_heroImage_BlockType {
+                    id
+                    image {
+                        ...Image
+                    }
+                    altText
+                }
+            }
+
+            authors: staffMember {
+                id
+                slug
+                title
+            }
+            description: summary
+            category: typeHandle
+            startDate: dateUpdated
+            endDate: dateUpdated
+        }
+    }
+    associatedEndowments: entries(
+        section: "endowments"
+        relatedToEntries: { section: "location", slug: $slug }
+    ) {
+        ... on endowment_endowments_Entry {
+            id
+            slug
+            title
+            summary
+            dateUpdated
+            heroImage {
+                ... on heroImage_heroImage_BlockType {
+                    id
+                    image {
+                        ...Image
+                    }
+                }
+            }
+        }
+    }
+    associatedEvents: entries(
+        section: "event"
+        orderBy: "startDateWithTime ASC"
+        startDateWithTime: ">= now"
+        relatedToEntries: { section: "location", slug: $slug }
+    ) {
+        ... on event_event_Entry {
+            id
+            slug
+            title: eventTitle
+            startDateWithTime
+                @formatDateTime(
+                    format: "Y-m-d\\TH:i"
+                    timezone: "America/Los_Angeles"
+                )
+            endDateWithTime
+                @formatDateTime(
+                    format: "Y-m-d\\TH:i"
+                    timezone: "America/Los_Angeles"
+                )
+            associatedLocations {
+                id
+                title
+                to: uri
+            }
+            requiresRegistration
+            eventDescription
+            #heroImage {
+            #   ... on heroImage_heroImage_BlockType {
+            #      id
+            #     image {
+            #        ...Image
+            #   }
+            #}
+            #}
+            eventType {
+                title
+            }
+            eventLocation {
+                title
+            }
+            isOnline: onlineEventUrl
+            moreInformation
+            eventOwner
+        }
+    }
+    associatedExhibitions: entries(
+        section: "exhibition"
+        relatedToEntries: { section: "location", slug: $slug }
+    ) {
+        ... on exhibition_exhibition_Entry {
+            id
+            title
+            id
+            slug
+            uri
+            title
+            summary
+            dateUpdated
+
+            ongoing
+            heroImage {
+                ... on heroImage_heroImage_BlockType {
+                    id
+                    image {
+                        ...Image
+                    }
+                }
+            }
+            startDate
+                @formatDateTime(
+                    format: "Y-m-d\\TH:i"
+                    timezone: "America/Los_Angeles"
+                )
+            endDate
+                @formatDateTime(
+                    format: "Y-m-d\\TH:i"
+                    timezone: "America/Los_Angeles"
+                )
+            associatedLocations {
+                id
+                title
+                to: uri
+            }
+        }
+    }
+}

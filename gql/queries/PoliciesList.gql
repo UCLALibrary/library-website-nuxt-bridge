@@ -1,0 +1,20 @@
+#import "~/gql/fragments/collections/AllFpbWithNoBanner"
+
+query PoliciesList {
+  entry(section: "listingPolicies") {
+    ... on listingPolicies_listingPolicies_Entry {
+      title
+      text: summary
+      policyBlock {
+        sectionSummary
+        sectionTitle
+        associatedEntries {
+          uri
+          title
+          text: summary
+        }
+      }
+      ...AllFpbWithNoBanner
+    }
+  }
+}

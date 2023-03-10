@@ -1,0 +1,25 @@
+#import "~/gql/fragments/collections/DefaultFpb"
+
+query HelpTopicDetail($slug: [String!]) {
+    entry(section: "helpTopic", slug: $slug) {
+        id
+        title
+        text: summary
+        richText
+        sectionHandle
+        slug
+        uri
+        helpTopicBlocks: helpTopicBlock {
+            id
+            sectionTitle
+            sectionSummary
+            associatedEntries {
+                uri
+                externalResourceUrl
+                title
+                text: summary
+            }
+        }
+        ...DefaultFpb
+    }
+}

@@ -1,0 +1,33 @@
+#import "~/gql/fragments/Image"
+
+query ExploreCollectionsList {
+    entry(section: "listingExploreCollections") {
+        title
+        summary
+        ... on listingExploreCollections_listingExploreCollections_Entry {
+            associatedTopics {
+                title
+                text: summary
+                uri
+                externalResourceUrl
+                iconName: illustrationsResourcesAndServices
+                sectionHandle
+            }
+        }
+    }
+    entries(section: "collection", orderBy: "postDate DESC") {
+        title
+        sectionHandle
+        text: summary
+        category: physicalDigital
+        uri
+        heroImage {
+            ... on heroImage_heroImage_BlockType {
+                id
+                image {
+                    ...Image
+                }
+            }
+        }
+    }
+}
